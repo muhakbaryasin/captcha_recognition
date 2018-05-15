@@ -1,3 +1,4 @@
+import datetime
 import sys
 name = sys.argv[1]
 iteration = sys.argv[2]
@@ -5,7 +6,7 @@ iteration_previous = sys.argv[3]
 mode = sys.argv[4]
 newTrainingImagesInEveryIteration = int(sys.argv[5])
 network = "src/" + sys.argv[6] + ".prototxt"
-caffe_root = sys.argv[7]
+#caffe_root = sys.argv[7]
 
 # We need to define how many digits our CAPTCHAs can have at maximum.
 # For simplicity we only have CAPTCHAs of fixed length 6 in this version!
@@ -28,7 +29,7 @@ import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-sys.path.insert(0, caffe_root + 'python')
+#sys.path.insert(0, caffe_root + 'python')
 import caffe
 import time
 import os
@@ -44,8 +45,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # for copy
 import shutil
-
-
 
 # This function maps the ascii value of a character to a number.
 # 0 -> 0, 1->1, ... 9->9, A->10, B->11, ... Z->35, 
@@ -85,7 +84,7 @@ if True:
 	for test_iteration in range(int(iteration_previous)+testAfterEveryIterations,int(iteration)+testAfterEveryIterations,testAfterEveryIterations):
 		
 		test_iteration=str(test_iteration)
-		print("Testing iteration {0} with final validation images...".format(test_iteration))
+		print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  Testing iteration {0} with final validation images...".format(test_iteration))
 		
 		folder_results_iteration = folder_results + test_iteration + "/"
 		model = 'temp/' + name + '/results/data_iter_' + test_iteration + '.caffemodel'
@@ -93,7 +92,8 @@ if True:
 		
 		
 		# Make classifier.
-		classifier = caffe.Classifier(network,model,gpu=True,mean=None)
+		#classifier = caffe.Classifier(network,model,gpu=True,mean=None)
+		classifier = caffe.Classifier(network,model,mean=None)
 		
 		
 		numberOfCorrectClassified = 0
@@ -217,11 +217,11 @@ if True:
 			
 			numberOfTestedFiles+=1
 			if numberOfTestedFiles % logAfterEveryFiles == 0:
-				print("{0} files have been processed".format(numberOfTestedFiles))
+				print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} files have been processed".format(numberOfTestedFiles))
 	
 		#print "Done in %.2f s." % (time.time() - start)
 		
-		print("{0} of {1} CAPTCHAs have been classified correctly ({2:2.2f}%)".format(
+		print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} of {1} CAPTCHAs have been classified correctly ({2:2.2f}%)".format(
 		numberOfCorrectClassified, numberOfTestedFiles, float(numberOfCorrectClassified) / numberOfTestedFiles*100))
 		#print("{0} of {1} CAPTCHAs have been classified nearly correctly (at most 1 character wrong) ({2:2.2f}%)".format(
 		#numberOfNearlyCorrectClassified, numberOfTestedFiles, float(numberOfNearlyCorrectClassified) / numberOfTestedFiles*100))
@@ -293,14 +293,9 @@ if True:
 
 # delete temp files
 if int(test_iteration) != int(iteration):
-	print("Deleting {0}...".format(model))
+	print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  Deleting {0}...".format(model))
 	os.remove(model)
 	os.remove(solverstate)
-
-
-
-
-
 
 
 numberOfCorrectClassified = 0
@@ -426,19 +421,19 @@ for file in os.listdir(folder):
 	
 	numberOfTestedFiles+=1
 	if numberOfTestedFiles % logAfterEveryFiles == 0:
-		print("{0} files have been processed".format(numberOfTestedFiles))
+		print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} files have been processed".format(numberOfTestedFiles))
 
 	 
 print "Done in %.2f s." % (time.time() - start)
 
-print("{0} of {1} CAPTCHAs have been classified correctly ({2:2.2f}%)".format(
+print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} of {1} CAPTCHAs have been classified correctly ({2:2.2f}%)".format(
 numberOfCorrectClassified, numberOfTestedFiles, float(numberOfCorrectClassified) / numberOfTestedFiles*100))
-print("{0} of {1} CAPTCHAs have been classified nearly correctly (at most 1 character wrong) ({2:2.2f}%)".format(
+print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} of {1} CAPTCHAs have been classified nearly correctly (at most 1 character wrong) ({2:2.2f}%)".format(
 numberOfNearlyCorrectClassified, numberOfTestedFiles, float(numberOfNearlyCorrectClassified) / numberOfTestedFiles*100))
 
 
 # sort trainImages (which will get the new training images in the next iteration)
-print("Sorting files...")
+print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " #################### Sorting files...")
 if mode=="wrong_mostcertain":
 	sorting = sorted(zip(uncertaintyWrongDigits,wrongImages), reverse=False)
 elif mode=="wrong_mostuncertain":
@@ -454,7 +449,7 @@ elif mode=="correct_random":
 	sorting = zip(uncertaintyCorrectDigits,correctImages)
 	shuffle(sorting)
 else:
-	print("No correct mode has been selected")
+	print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  No correct mode has been selected")
 	sys.exit(0)
 
 trainImages = [y for x,y in sorting]
@@ -463,10 +458,10 @@ trainImages = [y for x,y in sorting]
 # copy the $newTrainingImagesInEveryIteration (10000) first images (which will get the new training images in the next iteration)
 i=0
 for (i, item) in enumerate(trainImages):
-	#print("file {0} has uncertainty {1}".format(trainImages[i], i))
+	#print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  file {0} has uncertainty {1}".format(trainImages[i], i))
 	shutil.copy2(item, folder_new)
 	if i % logAfterEveryFiles == 0:
-		print("{0} files have been copied".format(i))
+		print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} files have been copied".format(i))
 	if i==newTrainingImagesInEveryIteration-1:
 		break
 
@@ -474,13 +469,13 @@ for (i, item) in enumerate(trainImages):
 # If we are reaching a very high accuracy, this is very likely to happen.
 if mode=="wrong_mostcertain" or mode=="wrong_mostuncertain" or mode=="wrong_random":
 	if i < newTrainingImagesInEveryIteration-1:
-		print("Sorting files 2...")
+		print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] # test_network.py ->  Sorting files 2...")
 		sorting = sorted(zip(uncertaintyCorrectDigits,correctImages), reverse=True)
 		trainImages = [y for x,y in sorting]
 		for j in xrange(i, newTrainingImagesInEveryIteration-1):
 			shutil.copy2(trainImages[j-i], folder_new)
 			if (j-i) % logAfterEveryFiles == 0:
-				print("{0} additional correct files have been copied".format(j-i))
+				print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  {0} additional correct files have been copied".format(j-i))
 
 
 
@@ -520,6 +515,6 @@ text_file.close()
 if int(iteration_previous) > 0:
 	model = 'temp/' + name + '/results/data_iter_' + iteration_previous + '.caffemodel'
 	solverstate = 'temp/' + name + '/results/data_iter_' + iteration_previous + '.solverstate'
-	print("Deleting {0}...".format(model))
+	print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "] ##################### test_network.py ->  Deleting {0}...".format(model))
 	os.remove(model)
 	os.remove(solverstate)

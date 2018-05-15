@@ -3,7 +3,6 @@
 
 # get variables
 name=$1
-caffe=$2
 
 logAfterEveryFiles=1000
 
@@ -25,7 +24,7 @@ else
 fi
 
 if [ ! -d "$TRAIN_DATA_ROOT" ]; then
-	echo "Error: TRAIN_DATA_ROOT is not a path to a directory."
+	echo "["`date '+%Y-%m-%d %H:%M:%S'`"] Error: TRAIN_DATA_ROOT is not a path to a directory."
 	exit 1
 fi
 
@@ -53,7 +52,7 @@ convertCharacterToOutput(){
 }
 
 
-echo "Creating $TRAIN"
+echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### createdb.sh ->  Creating $TRAIN"
 
 # first empty the text file
 cat /dev/null > $TRAIN
@@ -73,18 +72,21 @@ for name in $TRAIN_DATA_ROOT*; do
 		echo $filename"."$extension" "$asciivalue >> $TRAIN
 	done
 	if (( $n % $logAfterEveryFiles == 0 )); then
-		echo $n" files have been processed."
+		echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### createdb.sh ->  "$n" files have been processed."
 	fi
 	n=$((n+1))
 done
 
 
-echo "Creating train lmdb..."
+echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # createdb.sh ->  Creating train lmdb..."
 
 # cleanup: Remove old database
 rm -rf $TRAIN_DB
 
-GLOG_logtostderr=1 $caffe/build/tools/convert_imageset \
+echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] convert_imageset --gray --resize_height="$RESIZE_HEIGHT" --resize_width="$RESIZE_WIDTH" --shuffle "$TRAIN_DATA_ROOT" "$TRAIN" "$TRAIN_DB"\n"
+
+#GLOG_logtostderr=1 $caffe/build/tools/convert_imageset
+GLOG_logtostderr=1 convert_imageset \
 	--gray \
 	--resize_height=$RESIZE_HEIGHT \
 	--resize_width=$RESIZE_WIDTH \
@@ -93,6 +95,4 @@ GLOG_logtostderr=1 $caffe/build/tools/convert_imageset \
 	$TRAIN \
 	$TRAIN_DB
 
-
-
-echo "lmdb database created successful."
+echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### createdb.sh ->  lmdb database created successful."

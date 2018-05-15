@@ -1,5 +1,5 @@
 # path to caffe
-caffe=/usr/stud/starkf/caffe_new/
+# caffe=/home/go/Project/captcha_recognition/code/caffe_new/${1}
 
 # add Cuda Library path (not neccessary if path is set permanent)
 #export LD_LIBRARY_PATH=/usr/local/cuda-7.0/targets/x86_64-linux/lib
@@ -9,8 +9,14 @@ name=$1
 mode=$2
 network=$3
 network_test=$4
-echo -e "Starting with "$name" in mode "$mode
+echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  Starting with "$name" in mode "$mode
 
+
+#maxIter=45
+#finalTestingImages=2000
+#initialTrainingImages=10000
+#learningImagesInEveryIteration=100000
+#newTrainingImagesInEveryIteration=10000
 
 maxIter=45
 finalTestingImages=2000
@@ -73,11 +79,13 @@ if [ ! -d "temp/$name" ]; then
 	
 	
 	# create final testing images
-	echo -e "\nCreating final testing images..."
+	echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating final testing images..."
+	echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] php-cgi src/createcoolcaptchas.php folder="$name"/final_val_files amount="$finalTestingImages
 	php-cgi src/createcoolcaptchas.php folder=${name}/final_val_files amount=$finalTestingImages
 	
 	# create inital train images
-	echo -e "\nCreating inital training images..."
+	echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating inital training images..."
+	echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] php-cgi src/createcoolcaptchas.php folder="$name"/train_files amount="$initialTrainingImages
 	php-cgi src/createcoolcaptchas.php folder=${name}/train_files amount=$initialTrainingImages
 	
 	# The content of the files Output_accuracy_matlab.txt and Output_learning_accuracy_matlab.txt can be copied directly into Matlab to plot the accuracy
@@ -96,7 +104,7 @@ else
 			# check if this solverstate already exists
 			solverstate="temp/"$name"/results/data_iter_"$iters".solverstate"
 			if [ -f "$solverstate" ]; then
-				echo -e "Continuing from "$solverstate
+				echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  Continuing from "$solverstate
 				startiters=$i
 				break
 			else
@@ -105,46 +113,60 @@ else
 		done
 fi
 
+echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] =======================================================\nBlok 1. Done"
+echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  Start iteration : "$startiters" and max iteration: "$maxIter
+
 for (( i=$startiters; i<=$maxIter; i++ ))
 	do
 		getNumberOfIters
-		
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ====== iteration "$i" START ====="
 		# create database
-		echo -e "\nCreating lmdb database in iteration "$iters"..."
-		./src/createdb.sh $name $caffe
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating lmdb database in iteration "$iters"..."
+		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ./src/createdb.sh "$name"\n"
+		./src/createdb.sh $name
 		
 		# train the network
-		echo -e "\nTraining network..."
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Training network..."
+		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] caffe train --solver=temp/"$name"/captcha_solver.prototxt "
+		
 		sed -i 's/max_iter: [0-9][0-9]*/max_iter: '$iters'/' temp/${name}/captcha_solver.prototxt
+		
 		if [ "$iters_previous" -gt 0 ]; then
-			${caffe}/build/tools/caffe train --solver=temp/${name}/captcha_solver.prototxt "--snapshot=temp/"$name"/results/data_iter_"$iters_previous".solverstate"
+			#${caffe}/build/tools/caffe train --solver=temp/${name}/captcha_solver.prototxt "--snapshot=temp/"$name"/results/data_iter_"$iters_previous".solverstate"
+			echo -e "--snapshot=temp/"$name"/results/data_iter_"$iters_previous".solverstate"
+			caffe train --solver=temp/${name}/captcha_solver.prototxt "--snapshot=temp/"$name"/results/data_iter_"$iters_previous".solverstate"
 		else
-			${caffe}/build/tools/caffe train --solver=temp/${name}/captcha_solver.prototxt
+			#${caffe}/build/tools/caffe train --solver=temp/${name}/captcha_solver.prototxt
+			caffe train --solver=temp/${name}/captcha_solver.prototxt
 		fi
-		echo -e "\n... Finished traing.\n"
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  ... Finished traing.\n"
 		
 		# create learning images
-		echo -e "\nCreating learning images..."
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating learning images..."
+		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] php-cgi src/createcoolcaptchas.php folder="$name"/learning_files amount="$learningImagesInEveryIteration
 		php-cgi src/createcoolcaptchas.php folder=${name}/learning_files amount=$learningImagesInEveryIteration
 		
 		# compute accuracy and new train images (for the next iteration)
-		echo -e "\nTesting network after "$iters" iterations (and creating new training images for next iteration)..."
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Testing network after "$iters" iterations (and creating new training images for next iteration)..."
 		
 		#remove the old images
 		rm -rf temp/${name}/train_files/
 		mkdir temp/${name}/train_files/
 		
-		python src/test_network.py $name $iters $iters_previous $mode $newTrainingImagesInEveryIteration $network_test $caffe
+		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] python src/test_network.py "$name" "$iters" "$iters_previous" "$mode" "$newTrainingImagesInEveryIteration" "$network_test
+		python src/test_network.py $name $iters $iters_previous $mode $newTrainingImagesInEveryIteration $network_test
 		
-		echo -e "\n\n================================================================================\n\n"
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ====== iteration "$i" END ====="
 		
 	done
+
+echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] =======================================================\nBlok 2. Done"
 
 echo -n "])" >> results/$name/Output_accuracy_matlab.txt
 echo -n "])" >> results/$name/Output_learning_accuracy_matlab.txt
 
 #cleanup
-echo -e "\nCleaning up..."
-rm -rf temp/$name
+#echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  Cleaning up..."
+#rm -rf temp/$name
 
-echo -e "Finished!"
+echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### iterate.sh ->  Finished!"

@@ -5,5 +5,6 @@
 # Adjust $caffe variable in src/iterate.sh to point to your correct caffe foler
 
 chmod +x iterate.sh
-./iterate.sh > /dev/null 2>&1 & echo $! > /dev/null
-echo "The program was started in the background. All logs and outputs are written to the files results/<test_name>/log.txt and log2.txt"
+#./iterate.sh > /dev/null 2>&1 & echo $! > /dev/null
+./iterate.sh
+#echo "The program was started in the background. All logs and outputs are written to the files results/<test_name>/log.txt and log2.txt"

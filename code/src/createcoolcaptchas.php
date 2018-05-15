@@ -26,23 +26,24 @@ $captcha->minWordLength = 6;
 $captcha->maxWordLength = 6;
 
 //empty the folder first
-echo("Deleting old files...\n");
+echo("[".date('Y-m-d H:i:s')."] ##################### createcoolcaptchas.php ->  Deleting old files...\n");
 flush();ob_flush();flush();
 exec("rm -rf $folder");
 exec("mkdir $folder");
 
-
+echo("[".date('Y-m-d H:i:s')."] ##################### createcoolcaptchas.php ->  Number of images to generate -> ".$numberOfTrainImagesToGenerate). "\n";
 for($j=0; $j<$numberOfTrainImagesToGenerate; $j++) {
   // Image generation
   $captcha->CreateTrainImage();
   if($j % $logAfterEveryNumberOfCaptchas == 0) {
-    echo($j . " Training Samples have been created...(" . $captcha->skippedDuplicates . " skipped duplicates)\n");
+	if ($captcha->skippedDuplicates > 0)
+		echo("[".date('Y-m-d H:i:s')."] ##################### createcoolcaptchas.php ->  ". $j . " Training Samples have been created...(" . $captcha->skippedDuplicates . " skipped duplicates)\n");
     flush();ob_flush();flush();
     //ob_flush();flush();
     $captcha->skippedDuplicates = 0;
   }
 }
-echo($j . " Training Samples have been created...\n");
+echo("[".date('Y-m-d H:i:s')."] ##################### createcoolcaptchas.php ->  ".$j . " Generating Samples Done...\n");
 flush();ob_flush();flush();
 
 /**
