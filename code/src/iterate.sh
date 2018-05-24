@@ -122,8 +122,8 @@ for (( i=$startiters; i<=$maxIter; i++ ))
 		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ====== iteration "$i" START ====="
 		# create database
 		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating level database in iteration "$iters"..."
-		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ./src/createdb.sh "$name"\n"
-		./src/createdb.sh $name
+		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ./src/createdb.sh "$name" "$i"\n"
+		./src/createdb.sh $name $i
 		
 		# train the network
 		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Training network..."

@@ -3,6 +3,7 @@
 
 # get variables
 name=$1
+iter=$2
 
 logAfterEveryFiles=1000
 
@@ -80,7 +81,8 @@ done
 
 echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # createdb.sh ->  Creating train leveldb..."
 
-# cleanup: Remove old database
+# cleanup: backup old database
+cp -r $TRAIN_DB $TRAIN_DB""$iter
 rm -rf $TRAIN_DB
 
 echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] convert_imageset --gray --resize_height="$RESIZE_HEIGHT" --resize_width="$RESIZE_WIDTH" --shuffle "$TRAIN_DATA_ROOT" "$TRAIN" "$TRAIN_DB"\n"
