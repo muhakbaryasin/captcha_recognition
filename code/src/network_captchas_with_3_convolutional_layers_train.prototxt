@@ -6,7 +6,7 @@ layers {
   top: "label"
   data_param {
     source: "temp/<comes from shell script>"
-    backend: LMDB
+    backend: LEVELDB
     batch_size: 64
   }
   transform_param {

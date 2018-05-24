@@ -1,5 +1,5 @@
 ## !/usr/bin/env sh
-# Create lmdb database
+# Create leveldb database
 
 # get variables
 name=$1
@@ -78,7 +78,7 @@ for name in $TRAIN_DATA_ROOT*; do
 done
 
 
-echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # createdb.sh ->  Creating train lmdb..."
+echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # createdb.sh ->  Creating train leveldb..."
 
 # cleanup: Remove old database
 rm -rf $TRAIN_DB
@@ -87,7 +87,7 @@ echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] convert_imageset --gray --resize_height
 
 #GLOG_logtostderr=1 $caffe/build/tools/convert_imageset
 GLOG_logtostderr=1 convert_imageset \
-	--gray \
+	--gray --backend=leveldb \
 	--resize_height=$RESIZE_HEIGHT \
 	--resize_width=$RESIZE_WIDTH \
 	--shuffle \
@@ -95,4 +95,4 @@ GLOG_logtostderr=1 convert_imageset \
 	$TRAIN \
 	$TRAIN_DB
 
-echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### createdb.sh ->  lmdb database created successful."
+echo "["`date '+%Y-%m-%d %H:%M:%S'`"] ##################### createdb.sh ->  leveldb database created successful."

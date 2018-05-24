@@ -121,7 +121,7 @@ for (( i=$startiters; i<=$maxIter; i++ ))
 		getNumberOfIters
 		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] ====== iteration "$i" START ====="
 		# create database
-		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating lmdb database in iteration "$iters"..."
+		echo -e "\n["`date '+%Y-%m-%d %H:%M:%S'`"] # iterate.sh ->  Creating level database in iteration "$iters"..."
 		echo -e "["`date '+%Y-%m-%d %H:%M:%S'`"] ./src/createdb.sh "$name"\n"
 		./src/createdb.sh $name
 		
